@@ -3,16 +3,362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arbor Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Arbor</title>
+    <script src="https://telegram.org/js/telegram-web-app.js?1"></script>
     <style>
-        body { background: #0b1a0b; color: #78ab78; font-family: sans-serif; text-align: center; padding: 50px; }
-        button { background: #2d5a27; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 18px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f1a;
+            color: #c8c8d4;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 24px 0 20px 0;
+            border-bottom: 1px solid #1e1e32;
+            margin-bottom: 24px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #d4d4e8;
+            text-transform: uppercase;
+        }
+        
+        .header .sub {
+            font-size: 13px;
+            color: #6a6a82;
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+        
+        /* Tree Status */
+        .tree-status {
+            background: #161625;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid #22223a;
+            margin-bottom: 24px;
+        }
+        
+        .tree-icon {
+            font-size: 72px;
+            display: block;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+        
+        .tree-level {
+            font-size: 20px;
+            font-weight: 500;
+            color: #d4d4e8;
+        }
+        
+        .tree-level span {
+            color: #8b8baa;
+            font-weight: 300;
+        }
+        
+        .xp-bar {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+        
+        .xp-item {
+            font-size: 14px;
+            color: #8b8baa;
+        }
+        
+        .xp-item strong {
+            color: #d4d4e8;
+            font-weight: 500;
+        }
+        
+        /* Habits */
+        .habits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .habit-item {
+            background: #161625;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #22223a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .habit-item:hover {
+            background: #1c1c30;
+            border-color: #33334d;
+        }
+        
+        .habit-item.done {
+            border-color: #4a7a5a;
+            background: #141f1a;
+        }
+        
+        .habit-name {
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        
+        .habit-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #33334d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            color: #33334d;
+        }
+        
+        .habit-item.done .habit-check {
+            border-color: #4a7a5a;
+            background: #4a7a5a;
+            color: #141f1a;
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .stat-card {
+            background: #161625;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid #22223a;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: 300;
+            color: #d4d4e8;
+            letter-spacing: 1px;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #6a6a82;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: #1a1a2e;
+            margin: 20px 0;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 11px;
+            color: #3a3a52;
+            letter-spacing: 1px;
+        }
+        
+        /* Low-poly aesthetic */
+        .poly-bg {
+            background: linear-gradient(160deg, #0f0f1a 0%, #161625 50%, #0f0f1a 100%);
+        }
+        
+        .glow {
+            box-shadow: 0 0 40px rgba(74, 122, 90, 0.05);
+        }
     </style>
 </head>
-<body>
-    <h1>Arbor</h1>
-    <p>Grow your habits, protect your forest.</p>
-    <button onclick="window.Telegram.WebApp.close()">Start Growing</button>
+<body class="poly-bg">
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Arbor</h1>
+            <div class="sub">digital garden</div>
+        </div>
+
+        <!-- Tree Status -->
+        <div class="tree-status glow">
+            <span class="tree-icon" id="treeIcon">🌱</span>
+            <div class="tree-level">
+                Level <span id="treeLevel">1</span>
+            </div>
+            <div class="xp-bar">
+                <div class="xp-item">
+                    XP <strong id="userXp">0</strong>
+                </div>
+                <div class="xp-item">
+                    Waterings <strong id="userWaterings">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Habits -->
+        <div class="habits-list" id="habitsContainer">
+            <!-- Dynamic -->
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-number" id="doneCount">0</div>
+                <div class="stat-label">Done</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="streakCount">0</div>
+                <div class="stat-label">Streak</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+            tap to water your habits
+        </div>
+    </div>
+
+    <script>
+        // ===== TELEGRAM INIT =====
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+
+        // ===== STATE =====
+        let habits = [];
+        let stats = {
+            treeLevel: 1,
+            xp: 0,
+            waterings: 0
+        };
+
+        // ===== MOCK DATA (replace with real bot data) =====
+        function getMockHabits() {
+            return [
+                { name: 'Water intake', done: false },
+                { name: 'Reading', done: false },
+                { name: 'Exercise', done: false },
+                { name: 'Meditation', done: false }
+            ];
+        }
+
+        // ===== RENDER =====
+        function renderHabits() {
+            const container = document.getElementById('habitsContainer');
+            container.innerHTML = '';
+
+            habits.forEach((habit, index) => {
+                const div = document.createElement('div');
+                div.className = `habit-item${habit.done ? ' done' : ''}`;
+                div.innerHTML = `
+                    <span class="habit-name">${habit.name}</span>
+                    <span class="habit-check">${habit.done ? '✓' : ''}</span>
+                `;
+                
+                div.addEventListener('click', () => toggleHabit(index));
+                container.appendChild(div);
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            const done = habits.filter(h => h.done).length;
+            const total = habits.length;
+            
+            document.getElementById('doneCount').textContent = done;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('treeLevel').textContent = stats.treeLevel;
+            document.getElementById('userXp').textContent = stats.xp;
+            document.getElementById('userWaterings').textContent = stats.waterings;
+            
+            // Update tree icon based on level
+            const icon = document.getElementById('treeIcon');
+            if (stats.treeLevel <= 2) icon.textContent = '🌱';
+            else if (stats.treeLevel <= 4) icon.textContent = '🌿';
+            else if (stats.treeLevel <= 6) icon.textContent = '🌳';
+            else icon.textContent = '🌲';
+            
+            // Update streak (mock)
+            document.getElementById('streakCount').textContent = Math.floor(stats.xp / 30);
+        }
+
+        // ===== TOGGLE HABIT =====
+        function toggleHabit(index) {
+            habits[index].done = !habits[index].done;
+            
+            if (habits[index].done) {
+                stats.xp += 10;
+                stats.waterings += 1;
+                
+                // Level up every 50 XP
+                if (stats.xp >= stats.treeLevel * 50) {
+                    stats.treeLevel += 1;
+                }
+            }
+            
+            // Send to bot
+            tg.sendData(JSON.stringify({
+                action: 'toggle_habit',
+                habit_name: habits[index].name
+            }));
+            
+            renderHabits();
+        }
+
+        // ===== LOAD DATA =====
+        function loadData() {
+            // Try to get from bot
+            tg.sendData(JSON.stringify({
+                action: 'get_stats'
+            }));
+            
+            // Load mock data for now
+            habits = getMockHabits();
+            renderHabits();
+        }
+
+        // ===== INIT =====
+        loadData();
+    </script>
 </body>
 </html>
